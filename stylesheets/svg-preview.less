@@ -1,0 +1,19 @@
+.svg-preview {
+  @checkers-color: #CCC;
+  @background: #777;
+  @checkers-size: 50px;
+
+  background-color: #FFF;
+  overflow: scroll;
+  box-sizing: border-box;
+  padding: 20px;
+
+  & > :nth-child(1) {
+      background-color: @background;
+      background-size: @checkers-size @checkers-size;
+      background-position: 0 0, @checkers-size/2 @checkers-size/2;
+      background-image: linear-gradient(45deg, @checkers-color 25%, transparent 25%, transparent 75%, @checkers-color 75%, @checkers-color),
+                        linear-gradient(45deg, @checkers-color 25%, transparent 25%, transparent 75%, @checkers-color 75%, @checkers-color);
+
+  }
+}

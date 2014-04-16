@@ -1,0 +1,11 @@
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'SVG'
+      'submenu': [
+        { 'label': 'Toggle Preview', 'command': 'svg-preview:toggle' }
+      ]
+    ]
+  }
+]

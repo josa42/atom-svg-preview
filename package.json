@@ -1,0 +1,18 @@
+{
+  "name": "svg-preview",
+  "main": "./lib/svg-preview",
+  "version": "0.0.0",
+  "description": "Live SVG preview",
+  "repository": "https://github.com/lloeki/svg-preview",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {
+    "fs-plus": "2.x",
+    "pathwatcher": "^1.0",
+    "temp": "0.6.x",
+    "underscore-plus": "1.x",
+    "wrench": "1.5.x"
+  }
+}

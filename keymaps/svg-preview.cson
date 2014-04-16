@@ -1,0 +1,9 @@
+'.workspace':
+  'cmd-alt-v': 'svg-preview:toggle'
+
+'svg-preview':
+  'cmd-+': 'svg-preview:zoom-in'
+  'cmd-=': 'svg-preview:zoom-in'
+  'cmd--': 'svg-preview:zoom-out'
+  'cmd-_': 'svg-preview:zoom-out'
+  'cmd-0': 'svg-preview:reset-zoom'
