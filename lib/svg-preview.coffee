@@ -5,7 +5,7 @@ SvgPreviewView = require './svg-preview-view'
 
 module.exports =
   configDefaults:
-    grammars: [ 'text.xml' ]
+    grammars: [ 'text.plain.null-grammar', 'text.xml' ]
 
   activate: ->
     atom.workspaceView.command 'svg-preview:toggle', =>
