@@ -2,6 +2,8 @@
 
 Show the rendered SVG to the right of the current editor.
 
+[![Build Status](https://travis-ci.org/lloeki/svg-preview.svg)](https://travis-ci.org/lloeki/svg-preview)
+
 It can be activated from the editor using the `cmd-alt-v` key-binding and is
 currently enabled for `.xml` and `.svg` files.
 
