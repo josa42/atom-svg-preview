@@ -1,16 +1,13 @@
 path = require 'path'
-{WorkspaceView} = require 'atom'
 SvgPreviewView = require '../lib/svg-preview-view'
 
 describe "SvgPreviewView", ->
-  [file, preview] = []
+  [file, preview, workspaceElement] = []
 
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
-    atom.workspace = atom.workspaceView.model
-
-    filePath = atom.project.resolve('subdir/file.svg')
+    filePath = atom.project.getDirectories[0]?.resolve('subdir/file.svg')
     preview = new SvgPreviewView({filePath})
+    jasmine.attachToDOM(preview.element)
 
   afterEach ->
     preview.destroy()
@@ -24,7 +21,7 @@ describe "SvgPreviewView", ->
         preview.renderSvg()
 
       runs ->
-        expect(preview.find("#circle")).toExist()
+        expect(preview.find(".svg-spinner")).toExist()
 
     it "shows an error message when there is an error", ->
       preview.showError("Not a real file")
@@ -38,6 +35,7 @@ describe "SvgPreviewView", ->
 
     it "recreates the file when serialized/deserialized", ->
       newPreview = atom.deserializers.deserialize(preview.serialize())
+      jasmine.attachToDOM(newPreview.element)
       expect(newPreview.getPath()).toBe preview.getPath()
 
     it "serializes the editor id when opened for an editor", ->
@@ -47,8 +45,13 @@ describe "SvgPreviewView", ->
         atom.workspace.open('new.svg')
 
       runs ->
-        preview = new SvgPreviewView({editorId: atom.workspace.getActiveEditor().id})
-        expect(preview.getPath()).toBe atom.workspace.getActiveEditor().getPath()
+        preview = new SvgPreviewView
+          editorId: atom.workspace.getActiveTextEditor().id
+
+        jasmine.attachToDOM(preview.element)
+        expect(preview.getPath())
+          .toBe atom.workspace.getActiveTextEditor().getPath()
 
         newPreview = atom.deserializers.deserialize(preview.serialize())
+        jasmine.attachToDOM(newPreview.element)
         expect(newPreview.getPath()).toBe preview.getPath()

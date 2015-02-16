@@ -1,4 +1,4 @@
-'.workspace':
+'atom-workspace':
   'cmd-alt-v': 'svg-preview:toggle'
 
 'svg-preview':

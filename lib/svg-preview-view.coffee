@@ -1,5 +1,6 @@
 path = require 'path'
-{$, $$$, EditorView, ScrollView} = require 'atom'
+{Emitter, Disposable, CompositeDisposable} = require 'atom'
+{$, $$$, ScrollView} = require 'atom-space-pen-views'
 _ = require 'underscore-plus'
 {File} = require 'pathwatcher'
 
@@ -15,15 +16,21 @@ class SvgPreviewView extends ScrollView
 
   constructor: ({@editorId, filePath}) ->
     super
+    @emitter = new Emitter
+    @disposables = new CompositeDisposable
+
+  attached: ->
+    return if @isAttached
+    @isAttached = true
 
     if @editorId?
       @resolveEditor(@editorId)
     else
       if atom.workspace?
-        @subscribeToFilePath(filePath)
+        @subscribeToFilePath(@filePath)
       else
-        @subscribe atom.packages.once 'activated', =>
-          @subscribeToFilePath(filePath)
+        @disposables.add atom.packages.onDidActivateInitialPackages =>
+          @subscribeToFilePath(@filePath)
 
   serialize: ->
     deserializer: 'SvgPreviewView'
@@ -31,11 +38,21 @@ class SvgPreviewView extends ScrollView
     editorId: @editorId
 
   destroy: ->
-    @unsubscribe()
+    @disposables.dispose()
+
+  onDidChangeTitle: (callback) ->
+    @emitter.on 'did-change-title', callback
+
+  onDidChangeModified: (callback) ->
+    # No op to suppress deprecation warning
+    new Disposable
+
+  onDidChangeSvg: (callback) ->
+    @emitter.on 'did-change-svg', callback
 
   subscribeToFilePath: (filePath) ->
     @file = new File(filePath)
-    @trigger 'title-changed'
+    @emitter.emit 'did-change-title'
     @handleEvents()
     @renderSvg()
 
@@ -44,8 +61,9 @@ class SvgPreviewView extends ScrollView
       @editor = @editorForId(editorId)
 
       if @editor?
-        @trigger 'title-changed' if @editor?
+        @emitter.emit 'did-change-title' if @editor?
         @handleEvents()
+        @renderSvg()
       else
         # The editor this preview was created for has been closed so close
         # this preview since a preview cannot be rendered without an editor
@@ -54,53 +72,73 @@ class SvgPreviewView extends ScrollView
     if atom.workspace?
       resolve()
     else
-      @subscribe atom.packages.once 'activated', =>
-        resolve()
-        @renderSvg()
+      @disposables.add atom.packages.onDidActivateInitialPackages(resolve)
 
   editorForId: (editorId) ->
-    for editor in atom.workspace.getEditors()
+    for editor in atom.workspace.getTextEditors()
       return editor if editor.id?.toString() is editorId.toString()
     null
 
   handleEvents: ->
-    @subscribe atom.syntax, 'grammar-added grammar-updated', _.debounce((=> @renderSvg()), 250)
-    @subscribe this, 'core:move-up', => @scrollUp()
-    @subscribe this, 'core:move-down', => @scrollDown()
+    @disposables.add atom.grammars.onDidAddGrammar =>
+      _.debounce((=> @renderSvg()), 250)
+    @disposables.add atom.grammars.onDidUpdateGrammar =>
+      _.debounce((=> @renderSvg()), 250)
 
-    @subscribeToCommand atom.workspaceView, 'svg-preview:zoom-in', =>
-      zoomLevel = parseFloat(@css('zoom')) or 1
-      @css('zoom', zoomLevel + .1)
-
-    @subscribeToCommand atom.workspaceView, 'svg-preview:zoom-out', =>
-      zoomLevel = parseFloat(@css('zoom')) or 1
-      @css('zoom', zoomLevel - .1)
-
-    @subscribeToCommand atom.workspaceView, 'svg-preview:reset-zoom', =>
-      @css('zoom', 1)
+    atom.commands.add @element,
+      'core:move-up': =>
+        @scrollUp()
+      'core:move-down': =>
+        @scrollDown()
+      'svg-preview:zoom-in': =>
+        zoomLevel = parseFloat(@css('zoom')) or 1
+        @css('zoom', zoomLevel + .1)
+      'svg-preview:zoom-out': =>
+        zoomLevel = parseFloat(@css('zoom')) or 1
+        @css('zoom', zoomLevel - .1)
+      'svg-preview:reset-zoom': =>
+        @css('zoom', 1)
 
     changeHandler = =>
       @renderSvg()
-      pane = atom.workspace.paneForUri(@getUri())
+
+      # TODO: Remove paneForURI call when ::paneForItem is released
+      pane = atom.workspace.paneForItem?(this) ?
+             atom.workspace.paneForURI(@getURI())
       if pane? and pane isnt atom.workspace.getActivePane()
         pane.activateItem(this)
 
     if @file?
-      @subscribe(@file, 'contents-changed', changeHandler)
+      @disposables.add @file.onDidChange(changeHandler)
     else if @editor?
-      @subscribe(@editor.getBuffer(), 'contents-modified', changeHandler)
-      @subscribe @editor, 'path-changed', => @trigger 'title-changed'
+      @disposables.add @editor.getBuffer().onDidStopChanging ->
+        changeHandler() if atom.config.get 'svg-preview.liveUpdate'
+      @disposables.add @editor.getBuffer().onDidSave ->
+        changeHandler() unless atom.config.get 'svg-preview.liveUpdate'
+      @disposables.add @editor.getBuffer().onDidReload ->
+        changeHandler() unless atom.config.get 'svg-preview.liveUpdate'
+      @disposables.add @editor.onDidChangePath =>
+        @emitter.emit 'did-change-title'
 
   renderSvg: ->
     @showLoading()
+    @getSvgSource().then (source) => @renderSvgText(source) if source?
+
+  getSvgSource: ->
     if @file?
-      @file.read().then (contents) => @renderSvgText(contents)
+      @file.read()
     else if @editor?
-      @renderSvgText(@editor.getText())
+      Promise.resolve(@editor.getText())
+    else
+      Promise.resolve(null)
 
   renderSvgText: (text) ->
+    #@loading = false
+    #@empty()
+    #@append(text)
     @html(text)
-    @trigger('svg-preview:svg-changed')
+    @emitter.emit 'did-change-svg'
+    @originalTrigger('svg-preview:svg-changed')
 
   getTitle: ->
     if @file?
@@ -110,7 +148,10 @@ class SvgPreviewView extends ScrollView
     else
       "SVG Preview"
 
-  getUri: ->
+  getIconName: ->
+    "svg"
+
+  getURI: ->
     if @file?
       "svg-preview://#{@getPath()}"
     else
@@ -122,6 +163,9 @@ class SvgPreviewView extends ScrollView
     else if @editor?
       @editor.getPath()
 
+  getGrammar: ->
+    @editor?.getGrammar()
+
   showError: (result) ->
     failureMessage = result?.message
 
@@ -130,5 +174,9 @@ class SvgPreviewView extends ScrollView
       @h3 failureMessage if failureMessage?
 
   showLoading: ->
+    @loading = true
     @html $$$ ->
       @div class: 'svg-spinner', 'Loading SVG\u2026'
+
+  isEqual: (other) ->
+    @[0] is other?[0] # Compare DOM elements
