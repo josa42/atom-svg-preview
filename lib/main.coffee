@@ -28,6 +28,7 @@ module.exports =
       default: [
         'text.plain.null-grammar'
         'text.xml'
+        'text.xml.svg'
       ]
 
   activate: ->
