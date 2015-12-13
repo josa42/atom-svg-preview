@@ -86,7 +86,7 @@ module.exports =
       searchAllPanes: true
     if atom.config.get('svg-preview.openPreviewInSplitPane')
       options.split = 'right'
-    atom.workspace.open(uri, options).done (svgPreviewView) ->
+    atom.workspace.open(uri, options).then (svgPreviewView) ->
       if isSvgPreviewView(svgPreviewView)
         previousActivePane.activate()
 
