@@ -14,7 +14,7 @@ class SvgPreviewView extends ScrollView
   @content: ->
     @div class: 'svg-preview native-key-bindings', tabindex: -1
 
-  constructor: ({@editorId, filePath}) ->
+  constructor: ({@editorId, @filePath}) ->
     super
     @emitter = new Emitter
     @disposables = new CompositeDisposable
@@ -25,7 +25,7 @@ class SvgPreviewView extends ScrollView
 
     if @editorId?
       @resolveEditor(@editorId)
-    else
+    else if @filePath
       if atom.workspace?
         @subscribeToFilePath(@filePath)
       else
@@ -126,11 +126,11 @@ class SvgPreviewView extends ScrollView
 
   getSvgSource: ->
     if @file?
-      @file.read()
+      return @file.read()
     else if @editor?
-      Promise.resolve(@editor.getText())
+      return Promise.resolve(@editor.getText())
     else
-      Promise.resolve(null)
+      return Promise.resolve(null)
 
   renderSvgText: (text) ->
     #@loading = false
@@ -174,7 +174,6 @@ class SvgPreviewView extends ScrollView
       @h3 failureMessage if failureMessage?
 
   showLoading: ->
-    @loading = true
     @html $$$ ->
       @div class: 'svg-spinner', 'Loading SVG\u2026'
 

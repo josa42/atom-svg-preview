@@ -5,9 +5,11 @@ describe "SvgPreviewView", ->
   [file, preview, workspaceElement] = []
 
   beforeEach ->
-    filePath = atom.project.getDirectories[0]?.resolve('subdir/file.svg')
+    filePath = atom.project.getDirectories()[0]?.resolve('subdir/file.svg')
     preview = new SvgPreviewView({filePath})
     jasmine.attachToDOM(preview.element)
+
+    atom.deserializers.add(SvgPreviewView)
 
   afterEach ->
     preview.destroy()
@@ -21,7 +23,7 @@ describe "SvgPreviewView", ->
         preview.renderSvg()
 
       runs ->
-        expect(preview.find(".svg-spinner")).toExist()
+        expect(preview.find(".svg-spinner")).not.toExist()
 
     it "shows an error message when there is an error", ->
       preview.showError("Not a real file")

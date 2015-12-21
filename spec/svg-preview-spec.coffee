@@ -19,6 +19,8 @@ describe "SVG preview package", ->
     workspaceElement = atom.views.getView(atom.workspace)
     jasmine.attachToDOM(workspaceElement)
 
+    atom.deserializers.add(SvgPreviewView)
+
     waitsForPromise ->
       atom.packages.activatePackage("svg-preview")
 
@@ -113,7 +115,7 @@ describe "SVG preview package", ->
             svgEditor.setText("<svg></svg>")
 
           waitsFor ->
-            preview.text().indexOf("<svg></svg>") >= 0
+            preview.html().indexOf("<svg></svg>") >= 0
 
           runs ->
             expect(previewPane.isActive()).toBe true
@@ -134,7 +136,7 @@ describe "SVG preview package", ->
             svgEditor.setText("<svg></svg>")
 
           waitsFor ->
-            preview.text().indexOf("<svg></svg>") >= 0
+            preview.html().indexOf("<svg></svg>") >= 0
 
           runs ->
             expect(editorPane.isActive()).toBe true
@@ -152,16 +154,17 @@ describe "SVG preview package", ->
             didStopChangingHandler.callCount > 0
 
           runs ->
-            expect(preview.text()).not.toContain('<svg foo="bar"></svg>')
+            expect(preview.html()).not.toContain('<svg foo="bar"></svg>')
             atom.workspace.getActiveTextEditor().save()
 
           waitsFor ->
-            preview.text().indexOf("ch ch changes") >= 0
+            preview.html().indexOf('<svg foo="bar"></svg>') >= 0
 
   describe "when the svg preview view is requested by file URI", ->
     it "opens a preview editor and watches the file for changes", ->
       waitsForPromise "atom.workspace.open promise to be resolved", ->
-        atom.workspace.open("svg-preview://#{atom.project.getDirectories()[0].resolve('subdir/file.svg')}")
+        filePath = atom.project.getDirectories()[0].resolve('subdir/file.svg')
+        atom.workspace.open("svg-preview://#{filePath}")
 
       runs ->
         preview = atom.workspace.getActivePaneItem()
