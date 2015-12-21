@@ -1,4 +1,5 @@
 url = require 'url'
+{ TextEditor } = require 'atom'
 
 SvgPreviewView = null # Defer until used
 
@@ -23,6 +24,12 @@ module.exports =
     openPreviewInSplitPane:
       type: 'boolean'
       default: true
+    openPreviewAutomatically:
+      type: 'boolean'
+      default: false
+    closePreviewAutomatically:
+      type: 'boolean'
+      default: true
     grammars:
       type: 'array'
       default: [
@@ -33,8 +40,7 @@ module.exports =
 
   activate: ->
     atom.commands.add 'atom-workspace',
-      'svg-preview:toggle': =>
-        @toggle()
+      'svg-preview:toggle': => @toggle()
 
     atom.workspace.addOpener (uriToOpen) ->
       try
@@ -53,6 +59,38 @@ module.exports =
         createSvgPreviewView(editorId: pathname.substring(1))
       else
         createSvgPreviewView(filePath: pathname)
+
+    atom.workspace.onDidChangeActivePaneItem (item) =>
+      @onDidChangeActivePaneItem(item)
+
+    atom.workspace.onWillDestroyPaneItem (event) =>
+      @onWillDestroyPaneItem(event.item)
+
+  onWillDestroyPaneItem: (item) ->
+    return unless (
+      atom.config.get('svg-preview.closePreviewAutomatically') and
+      atom.config.get('svg-preview.openPreviewInSplitPane')
+    )
+    @removePreviewForEditor(item)
+
+  onDidChangeActivePaneItem: (item) ->
+    return unless (
+      atom.config.get('svg-preview.openPreviewAutomatically') and
+      atom.config.get('svg-preview.openPreviewInSplitPane') and
+      @isSvgEditor item
+    )
+    @addPreviewForEditor item
+
+  isSvgEditor: (item) ->
+    grammars = atom.config.get('svg-preview.grammars') ? []
+    grammar = item?.getGrammar?()?.scopeName
+
+    return (
+      item instanceof TextEditor and (
+        grammar is 'text.xml.svg' or
+        ( grammar in grammars and item.getText().match(/<svg/) )
+      )
+    )
 
   toggle: ->
     if isSvgPreviewView(atom.workspace.getActivePaneItem())
@@ -84,6 +122,7 @@ module.exports =
     previousActivePane = atom.workspace.getActivePane()
     options =
       searchAllPanes: true
+      activatePane: false
     if atom.config.get('svg-preview.openPreviewInSplitPane')
       options.split = 'right'
     atom.workspace.open(uri, options).then (svgPreviewView) ->
