@@ -1,7 +1,7 @@
 {
   "name": "svg-preview",
   "main": "./lib/main",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Live SVG preview",
   "repository": "https://github.com/josa42/atom-svg-preview",
   "license": "MIT",
