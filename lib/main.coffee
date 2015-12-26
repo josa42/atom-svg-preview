@@ -1,5 +1,4 @@
 url = require 'url'
-{ TextEditor } = require 'atom'
 
 SvgPreviewView = null # Defer until used
 
@@ -86,10 +85,9 @@ module.exports =
     grammar = item?.getGrammar?()?.scopeName
 
     return (
-      item instanceof TextEditor and (
-        grammar is 'text.xml.svg' or
-        ( grammar in grammars and item.getText().match(/<svg/) )
-      )
+      ( item?.getBuffer? and item?.getText? and item?.getGrammar?)
+      grammar is 'text.xml.svg' or
+      ( grammar in grammars and item.getText().match(/<svg/) )
     )
 
   toggle: ->
