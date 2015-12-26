@@ -1,7 +1,7 @@
 path = require 'path'
 {Emitter, Disposable, CompositeDisposable, File} = require 'atom'
 {$, $$$, ScrollView} = require 'atom-space-pen-views'
-_ = require 'underscore-plus'
+debounce = require 'debounce'
 
 module.exports =
 class SvgPreviewView extends ScrollView
@@ -80,9 +80,9 @@ class SvgPreviewView extends ScrollView
 
   handleEvents: ->
     @disposables.add atom.grammars.onDidAddGrammar =>
-      _.debounce((=> @renderSvg()), 250)
+      debounce((=> @renderSvg()), 250)
     @disposables.add atom.grammars.onDidUpdateGrammar =>
-      _.debounce((=> @renderSvg()), 250)
+      debounce((=> @renderSvg()), 250)
 
     atom.commands.add @element,
       'core:move-up': =>
