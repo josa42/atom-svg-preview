@@ -1,8 +1,7 @@
 path = require 'path'
-{Emitter, Disposable, CompositeDisposable} = require 'atom'
+{Emitter, Disposable, CompositeDisposable, File} = require 'atom'
 {$, $$$, ScrollView} = require 'atom-space-pen-views'
 _ = require 'underscore-plus'
-{File} = require 'pathwatcher'
 
 module.exports =
 class SvgPreviewView extends ScrollView
