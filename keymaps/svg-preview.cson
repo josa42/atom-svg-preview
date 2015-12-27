@@ -1,9 +1,20 @@
 'atom-workspace':
   'cmd-alt-v': 'svg-preview:toggle'
 
-'.svg-preview':
+'.platform-darwin .svg-preview':
   'cmd-+': 'svg-preview:zoom-in'
   'cmd-=': 'svg-preview:zoom-in'
   'cmd--': 'svg-preview:zoom-out'
   'cmd-_': 'svg-preview:zoom-out'
   'cmd-0': 'svg-preview:reset-zoom'
+
+
+'.platform-linux atom-workspace, .platform-win32 atom-workspace':
+  'ctrl-alt-v': 'svg-preview:toggle'
+
+'.platform-linux .svg-preview, .platform-win32 .svg-preview':
+  'ctrl-+': 'svg-preview:zoom-in'
+  'ctrl-=': 'svg-preview:zoom-in'
+  'ctrl--': 'svg-preview:zoom-out'
+  'ctrl-_': 'svg-preview:zoom-out'
+  'ctrl-0': 'svg-preview:reset-zoom'
