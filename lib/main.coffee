@@ -81,12 +81,11 @@ module.exports =
     @addPreviewForEditor item
 
   isSvgEditor: (item) ->
-    grammars = atom.config.get('svg-preview.grammars') ? []
+    grammars = ['text.xml.svg'].concat(atom.config.get('svg-preview.grammars') ? [])
     grammar = item?.getGrammar?()?.scopeName
 
     return (
-      ( item?.getBuffer? and item?.getText? and item?.getGrammar?)
-      grammar is 'text.xml.svg' or
+      ( item?.getBuffer? and item?.getText? ) and
       ( grammar in grammars and item.getText().match(/<svg/) )
     )
 
@@ -121,8 +120,12 @@ module.exports =
     options =
       searchAllPanes: true
       activatePane: false
+
     if atom.config.get('svg-preview.openPreviewInSplitPane')
       options.split = 'right'
+
+    console.log 'uri', uri
+
     atom.workspace.open(uri, options).then (svgPreviewView) ->
       if isSvgPreviewView(svgPreviewView)
         previousActivePane.activate()
