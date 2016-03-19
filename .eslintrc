@@ -11,6 +11,7 @@
 
   "rules": {
     "semi": [ 2, "never" ],
-    "arrow-parens": [ 2, "always" ]
+    "arrow-parens": [ 2, "always" ],
+    "no-var": 2
   }
 }
