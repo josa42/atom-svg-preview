@@ -1,0 +1,16 @@
+{
+  "env": {},
+  "globals": {},
+
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "modules": true
+    }
+  },
+
+  "rules": {
+    "semi": [ 2, "never" ],
+    "arrow-parens": [ 2, "always" ]
+  }
+}

@@ -1,12 +1,17 @@
 {
   "name": "svg-preview",
   "main": "./lib/main",
+  "author": "Josa Gesell <josa@gesell.me>",
   "version": "0.7.4",
   "description": "Live SVG preview",
   "repository": "https://github.com/josa42/atom-svg-preview",
   "license": "MIT",
   "engines": {
-    "atom": ">0.200.0"
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "scripts": {
+    "lint": "eslint '**/*.js'",
+    "test": "apm test"
   },
   "dependencies": {
     "atom-space-pen-views": "^2.2.0",
