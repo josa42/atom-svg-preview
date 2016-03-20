@@ -32,6 +32,7 @@ describe('SvgPreviewView', () => {
       expect(preview.text()).toContain("Failed")
     })
   })
+
   describe('serialization', () => {
     let newPreview = null
 
