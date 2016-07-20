@@ -216,3 +216,55 @@ describe "SVG preview package", ->
 
       runs ->
         expect(atom.workspace.getActiveTextEditor()).toBeTruthy()
+
+  describe "when svg-preview:export-to-png is triggered", ->
+    beforeEach ->
+      fixturesPath = path.join(__dirname, 'fixtures')
+      tempPath = temp.mkdirSync('atom')
+      wrench.copyDirSyncRecursive(fixturesPath, tempPath, forceDelete: true)
+      atom.project.setPaths([tempPath])
+
+      workspaceElement = atom.views.getView(atom.workspace)
+      jasmine.attachToDOM(workspaceElement)
+
+    it "saves a PNG and opens it", ->
+      outputPath = temp.path() + 'subdir/file with space.png'
+      previewPaneItem = null
+
+      waitsForPromise ->
+        atom.workspace.open('subdir/file with space.svg')
+      runs ->
+        atom.commands.dispatch workspaceElement, 'svg-preview:toggle'
+      waitsFor ->
+        previewPaneItem = atom.workspace.getPanes()[1].getActiveItem()
+      runs ->
+        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        atom.commands.dispatch previewPaneItem.element, 'svg-preview:export-to-png'
+      waitsFor ->
+        fs.existsSync(outputPath)
+
+      runs ->
+        expect(fs.isFileSync(outputPath)).toBe true
+        writtenFile = fs.readFileSync outputPath
+        expect(writtenFile).toContain "PNG"
+
+    it "saves a JPEG and opens it", ->
+      outputPath = temp.path() + 'subdir/file with space.jpeg'
+      previewPaneItem = null
+
+      waitsForPromise ->
+        atom.workspace.open('subdir/file with space.svg')
+      runs ->
+        atom.commands.dispatch workspaceElement, 'svg-preview:toggle'
+      waitsFor ->
+        previewPaneItem = atom.workspace.getPanes()[1].getActiveItem()
+      runs ->
+        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        atom.commands.dispatch previewPaneItem.element, 'svg-preview:export-to-jpeg'
+      waitsFor ->
+        fs.existsSync(outputPath)
+
+      runs ->
+        expect(fs.isFileSync(outputPath)).toBe true
+        writtenFile = fs.readFileSync outputPath
+        expect(writtenFile).toContain "JFIF"

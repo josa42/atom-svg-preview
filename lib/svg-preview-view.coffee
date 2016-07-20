@@ -2,6 +2,8 @@ path = require 'path'
 {Emitter, Disposable, CompositeDisposable, File} = require 'atom'
 {$, $$$, ScrollView} = require 'atom-space-pen-views'
 debounce = require 'debounce'
+fs = null # Defer until used
+svgToRaster = null # Defer until used
 
 module.exports =
 class SvgPreviewView extends ScrollView
@@ -97,6 +99,13 @@ class SvgPreviewView extends ScrollView
         @css('zoom', zoomLevel - .1)
       'svg-preview:reset-zoom': =>
         @css('zoom', 1)
+      'svg-preview:export-to-png': (event) =>
+        event.stopPropagation()
+        @exportTo('png')
+      'svg-preview:export-to-jpeg': (event) =>
+        event.stopPropagation()
+        @exportTo('jpeg')
+
 
     changeHandler = =>
       @renderSvg()
@@ -175,6 +184,29 @@ class SvgPreviewView extends ScrollView
   showLoading: ->
     @html $$$ ->
       @div class: 'svg-spinner', 'Loading SVG\u2026'
+
+  exportTo: (outputType) ->
+    return if @loading
+
+    filePath = @getPath()
+    if filePath
+      filePath = path.join(
+        path.dirname(filePath),
+        path.basename(filePath, path.extname(filePath)),
+      ).concat('.').concat(outputType)
+    else
+      filePath = 'untitled.'.concat(outputType)
+      if projectPath = atom.project.getPaths()[0]
+        filePath = path.join(projectPath, filePath)
+
+    if outputFilePath = atom.showSaveDialogSync(filePath)
+      svgToRaster ?= require './svg-to-raster'
+      fs ?= require 'fs-plus'
+
+      @getSvgSource().then (source) ->
+        svgToRaster.transform source, outputType, (result) ->
+          fs.writeFileSync(outputFilePath, result)
+          atom.workspace.open(outputFilePath)
 
   isEqual: (other) ->
     @[0] is other?[0] # Compare DOM elements
