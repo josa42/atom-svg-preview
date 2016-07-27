@@ -9,3 +9,8 @@
     ]
   }
 ]
+'context-menu':
+  '.svg-preview': [
+    {label: 'Export to PNG\u2026', command: 'svg-preview:export-to-png'},
+    {label: 'Export to JPEG\u2026', command: 'svg-preview:export-to-jpeg'}
+  ]
