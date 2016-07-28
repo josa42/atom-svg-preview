@@ -241,4 +241,58 @@ describe('SVG preview package', () => {
       runs(() => expect(atom.workspace.getActiveTextEditor()).toBeTruthy())
     })
   })
+
+  describe("when svg-preview:export-to-png is triggered", () => {
+    beforeEach(() => {
+      let fixturesPath, tempPath, workspaceElement
+      fixturesPath = path.join(__dirname, 'fixtures')
+      tempPath = temp.mkdirSync('atom')
+      wrench.copyDirSyncRecursive(fixturesPath, tempPath, {
+        forceDelete: true
+      })
+      atom.project.setPaths([tempPath])
+      workspaceElement = atom.views.getView(atom.workspace)
+      return jasmine.attachToDOM(workspaceElement)
+    })
+    it("saves a PNG and opens it", () => {
+      let outputPath, previewPaneItem
+      outputPath = `${temp.path()}subdir/file with space.png`
+      previewPaneItem = null
+      waitsForPromise(() => atom.workspace.open('subdir/file with space.svg'))
+      runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
+      waitsFor(() => previewPaneItem = atom.workspace.getPanes()[1].getActiveItem())
+      runs(() => {
+        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        return atom.commands.dispatch(previewPaneItem.element, 'svg-preview:export-to-png')
+      })
+      waitsFor(() => fs.existsSync(outputPath))
+      return runs(() => {
+        let writtenFile
+        expect(fs.isFileSync(outputPath)).toBe(true)
+        writtenFile = fs.readFileSync(outputPath)
+        return expect(writtenFile).toContain("PNG")
+      })
+    })
+    return it("saves a JPEG and opens it", () => {
+      let outputPath, previewPaneItem
+      outputPath = `${temp.path()}subdir/file with space.jpeg`
+      previewPaneItem = null
+      waitsForPromise(() => atom.workspace.open('subdir/file with space.svg'))
+      runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
+      waitsFor(() => previewPaneItem = atom.workspace.getPanes()[1].getActiveItem())
+      runs(() => {
+        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        return atom.commands.dispatch(previewPaneItem.element, 'svg-preview:export-to-jpeg')
+      })
+      waitsFor(() => fs.existsSync(outputPath))
+      return runs(() => {
+        let writtenFile
+        expect(fs.isFileSync(outputPath)).toBe(true)
+        writtenFile = fs.readFileSync(outputPath)
+        return expect(writtenFile).toContain("JFIF")
+      })
+    })
+  })
+
+
 })

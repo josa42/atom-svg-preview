@@ -15,11 +15,11 @@
     "test": "apm test"
   },
   "dependencies": {
+    "fs-plus": "^2.9.1",
     "atom-space-pen-views": "^2.2.0",
     "debounce": "^1.0.0"
   },
   "devDependencies": {
-    "fs-plus": "^2.9.1",
     "temp": "^0.8.3",
     "wrench": "^1.5.9"
   }
