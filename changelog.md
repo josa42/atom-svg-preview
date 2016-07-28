@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+- Convert to ES6 JavaScript
+- Add background controls
+
 ## 0.7.3
 - Add Windows and Linux keybindings
 - Add Windows testing (appveyor)
