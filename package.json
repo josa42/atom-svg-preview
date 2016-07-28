@@ -2,7 +2,7 @@
   "name": "svg-preview",
   "main": "./lib/main",
   "author": "Josa Gesell <josa@gesell.me>",
-  "version": "0.7.4",
+  "version": "0.8.0",
   "description": "Live SVG preview",
   "repository": "https://github.com/josa42/atom-svg-preview",
   "license": "MIT",
