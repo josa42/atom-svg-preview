@@ -3,7 +3,14 @@
 @checkers-size: 10px;
 @spacing: @component-padding/2;
 
-// Image Controls -------------------
+.checkerBoard(@checkers-color, @background) {
+  background-color: @background;
+  background-size: @checkers-size @checkers-size;
+  background-position: 0 0, @checkers-size/2 @checkers-size/2;
+  background-image: linear-gradient(45deg, @checkers-color 25%, transparent 25%, transparent 75%, @checkers-color 75%, @checkers-color),
+                    linear-gradient(45deg, @checkers-color 25%, transparent 25%, transparent 75%, @checkers-color 75%, @checkers-color);
+}
+
 .svg-preview {
   background-color: @base-background-color;
 
@@ -13,21 +20,22 @@
     align-items: center;
 
     padding: @spacing;
+
     border-bottom: 1px solid @panel-heading-border-color;
     background-color: @panel-heading-background-color;
 
     a {
       display: inline-block;
-      position: relative;
       width: 24px;
       height: 24px;
       margin: @spacing;
+
       vertical-align: middle;
       font-size: 0;
+
       border-radius: 22px;
       border: 2px solid #fff;
       box-shadow: inset 0 1px 2px hsla(0,0%,0%,.4), 0 0 0 1px hsla(0,0%,0%,.1), 0 2px 2px hsla(0,0%,0%,.2);
-      background-clip: content-box;
 
       &:hover {
         border-color: #ccc;
@@ -58,23 +66,9 @@
 
   // Background color
   &[background="white"], .image-controls-color-white {
-    @checkers-color: rgb(227, 227, 227);
-    @background: #ffffff;
-
-    background-color: @background;
-    background-size: @checkers-size @checkers-size;
-    background-position: 0 0, @checkers-size/2 @checkers-size/2;
-    background-image: linear-gradient(45deg, @checkers-color 25%, transparent 25%, transparent 75%, @checkers-color 75%, @checkers-color),
-                      linear-gradient(45deg, @checkers-color 25%, transparent 25%, transparent 75%, @checkers-color 75%, @checkers-color);
+    .checkerBoard(rgb(255, 255, 255), rgb(227, 227, 227))
   }
   &[background="black"], .image-controls-color-black {
-    @checkers-color: rgb(43, 43, 43);
-    @background: #000000;
-
-    background-color: @background;
-    background-size: @checkers-size @checkers-size;
-    background-position: 0 0, @checkers-size/2 @checkers-size/2;
-    background-image: linear-gradient(45deg, @checkers-color 25%, transparent 25%, transparent 75%, @checkers-color 75%, @checkers-color),
-                      linear-gradient(45deg, @checkers-color 25%, transparent 25%, transparent 75%, @checkers-color 75%, @checkers-color);
+    .checkerBoard(rgb(0, 0, 0), rgb(43, 43, 43))
   }
 }
