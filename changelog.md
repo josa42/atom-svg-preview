@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.0
+- Add `export-to-png` and `export-to-jpeg` commands.
+
 ## 0.8.0
 - Convert to ES6 JavaScript
 - Add background controls
