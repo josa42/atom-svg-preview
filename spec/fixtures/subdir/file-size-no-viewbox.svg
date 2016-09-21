@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     version="1.1">
+     <defs>
+         <radialGradient id="gradient"
+                         r="0.5"
+                         cx="0.5"
+                         cy="0.35"
+                         fx="0.5"
+                         fy="0.1"
+                         spreadMethod="pad">
+             <stop offset="0" stop-opacity="0.3" stop-color="#40FFFF"/>
+             <stop offset="1" stop-opacity="1" stop-color="#1060AA"/>
+         </radialGradient>
+    </defs>
+
+     <g display="inline">
+       <circle id="circle"
+               r="50"
+               cx="50"
+               cy="50"
+               stroke-width="0"
+               fill="url(#gradient)"/>
+     </g>
+</svg>

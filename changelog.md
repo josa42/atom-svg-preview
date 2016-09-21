@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.0
+- More consistent zooming behavior
+
 ## 0.10.2
 - Fix bugs related to not properly deactivating the package.
 

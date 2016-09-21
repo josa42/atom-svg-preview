@@ -151,13 +151,16 @@ describe('SVG preview package', () => {
           previewPane.splitRight({ copyActiveItem: true })
           previewPane.activate()
 
+          let didChange = false
+          preview.onDidChangeSvg(() => didChange = true)
+
           waitsForPromise(() => atom.workspace.open())
           runs(() => {
             editorPane.activate()
             return svgEditor.setText("<svg></svg>")
           })
 
-          waitsFor(() => preview.find('.image-canvas').html().match(/<svg[^>]*><\/svg>/))
+          waitsFor(() => didChange)
           runs(() => {
             expect(editorPane.isActive()).toBe(true)
             expect(previewPane.getActiveItem()).toBe(preview)
@@ -176,7 +179,7 @@ describe('SVG preview package', () => {
 
           waitsFor(() => didStopChangingHandler.callCount > 0)
           runs(() => {
-            expect(preview.html()).not.toContain('<svg foo="bar"></svg>')
+            expect(preview.find('.image-canvas').html()).not.toContain('<svg foo="bar"')
             atom.workspace.getActiveTextEditor().save()
           })
 
