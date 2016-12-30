@@ -127,13 +127,14 @@ describe('SVG preview package', () => {
         it('re-renders the preview but does not make it active', () => {
           const svgEditor = atom.workspace.getActiveTextEditor()
           const [_, previewPane ] = atom.workspace.getPanes()
+          const preview = previewPane.itemAtIndex(0)
 
           previewPane.activate()
 
           waitsForPromise(() => atom.workspace.open())
           runs(() => svgEditor.setText("<svg></svg>"))
 
-          waitsFor(() => preview.html().indexOf("<svg></svg>") >= 0)
+          waitsFor(() => preview.find('.image-canvas').html().match(/<svg[^>]*><\/svg>/))
           runs(() => {
             expect(previewPane.isActive()).toBe(true)
             expect(previewPane.getActiveItem()).not.toBe(preview)
@@ -145,6 +146,7 @@ describe('SVG preview package', () => {
         it('re-renders the preview and makes it active', () => {
           const svgEditor = atom.workspace.getActiveTextEditor()
           const [ editorPane, previewPane ] = atom.workspace.getPanes()
+          const preview = previewPane.itemAtIndex(0)
 
           previewPane.splitRight({ copyActiveItem: true })
           previewPane.activate()
@@ -155,7 +157,7 @@ describe('SVG preview package', () => {
             return svgEditor.setText("<svg></svg>")
           })
 
-          waitsFor(() => preview.html().indexOf("<svg></svg>") >= 0)
+          waitsFor(() => preview.find('.image-canvas').html().match(/<svg[^>]*><\/svg>/))
           runs(() => {
             expect(editorPane.isActive()).toBe(true)
             expect(previewPane.getActiveItem()).toBe(preview)
@@ -178,7 +180,7 @@ describe('SVG preview package', () => {
             atom.workspace.getActiveTextEditor().save()
           })
 
-          waitsFor(() => preview.html().indexOf('<svg foo="bar"></svg>') >= 0)
+          waitsFor(() => preview.find('.image-canvas').html().match(/<svg foo="bar"[^>]*><\/svg>/))
         })
       })
     })
