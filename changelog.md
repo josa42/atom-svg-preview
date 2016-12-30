@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.2
+- Fix bugs related to not properly deactivating the package.
+
 ## 0.10.1
 - Fix zoom reset on save
 

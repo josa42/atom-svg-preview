@@ -22,5 +22,8 @@
   "devDependencies": {
     "temp": "^0.8.3",
     "wrench": "^1.5.9"
+  },
+  "deserializers": {
+    "SvgPreviewView": "deserializeSvgPreviewView"
   }
 }
