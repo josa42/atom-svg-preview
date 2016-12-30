@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.1
+- Fix zoom reset on save
+
 ## 0.10.0
 - Zoom buttons (@dirk-thomas)
 
