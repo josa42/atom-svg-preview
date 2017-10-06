@@ -15,7 +15,7 @@
     "test": "apm test"
   },
   "dependencies": {
-    "fs-plus": "^2.9.1",
+    "fs-plus": "^3.0.1",
     "atom-space-pen-views": "^2.2.0",
     "debounce": "^1.0.0"
   },

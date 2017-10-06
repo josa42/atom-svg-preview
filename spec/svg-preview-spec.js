@@ -6,9 +6,10 @@ const temp = require('temp')
 const wrench = require('wrench')
 const SvgPreviewView = require('../lib/svg-preview-view')
 const { $ } = require('atom-space-pen-views')
+import { TextEditor } from 'atom'
 
 describe('SVG preview package', () => {
-  let preview, workspaceElement
+  let preview, editor, workspaceElement
 
   beforeEach(() => {
     const fixturesPath = path.join(__dirname, 'fixtures')
@@ -28,12 +29,15 @@ describe('SVG preview package', () => {
     })
   })
   const expectPreviewInSplitPane = function() {
-    runs(() => expect(atom.workspace.getPanes()).toHaveLength(2))
-
+    waitsFor('svg editor to be created', () => {
+      return editor = atom.workspace.getPanes()[0].getActiveItem()
+    })
+    
     waitsFor('svg preview to be created', () => {
       return preview = atom.workspace.getPanes()[1].getActiveItem()
     })
     runs(() => {
+      expect(editor).toBeInstanceOf(TextEditor)
       expect(preview).toBeInstanceOf(SvgPreviewView)
       expect(preview.getPath()).toBe(atom.workspace.getActivePaneItem().getPath())
     })
