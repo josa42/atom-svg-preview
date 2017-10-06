@@ -28,11 +28,12 @@ describe('SVG preview package', () => {
       return atom.packages.activatePackage("svg-preview")
     })
   })
+
   const expectPreviewInSplitPane = function() {
     waitsFor('svg editor to be created', () => {
       return editor = atom.workspace.getPanes()[0].getActiveItem()
     })
-    
+
     waitsFor('svg preview to be created', () => {
       return preview = atom.workspace.getPanes()[1].getActiveItem()
     })
@@ -42,6 +43,9 @@ describe('SVG preview package', () => {
       expect(preview.getPath()).toBe(atom.workspace.getActivePaneItem().getPath())
     })
   }
+
+  // TODO come up with a better solution
+  const runsAfter = (time, fn) => waitsForPromise(() => new Promise((resolve) => setTimeout(resolve, time)).then(fn))
 
   describe('when a preview has not been created for the file', () => {
     it('displays a svg preview in a split pane', () => {
@@ -90,7 +94,7 @@ describe('SVG preview package', () => {
     })
   })
 
-  describe('when a preview has been created for the file', () => {
+  describe('when a preview has been created for the file', (done) => {
     beforeEach(function() {
       waitsForPromise(() => atom.workspace.open("subdir/file.svg"))
       runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
@@ -99,19 +103,24 @@ describe('SVG preview package', () => {
 
     it('closes the existing preview when toggle is triggered a second time on the editor', () => {
       atom.commands.dispatch(workspaceElement, 'svg-preview:toggle')
-      const [ editorPane, previewPane ] = atom.workspace.getPanes()
 
-      expect(editorPane.isActive()).toBe(true)
-      expect(previewPane.getActiveItem()).toBeUndefined()
+      // TODO come up with a better solution
+      runsAfter(100, () => {
+        const [ editorPane, previewPane ] = atom.workspace.getCenter().getPanes()
+
+        expect(editorPane.isActive()).toBe(true)
+        expect(previewPane.getActiveItem()).toBeUndefined()
+      })
     })
 
     it('closes the existing preview when toggle is triggered on it and it has focus', () => {
       const [ editorPane, previewPane ] = atom.workspace.getPanes()
-
       previewPane.activate()
       atom.commands.dispatch(workspaceElement, 'svg-preview:toggle')
 
-      expect(previewPane.getActiveItem()).toBeUndefined()
+      runsAfter(100, () => {
+        expect(previewPane.getActiveItem()).toBeUndefined()
+      })
     })
 
     describe('when the editor is modified', () => {
@@ -308,6 +317,4 @@ describe('SVG preview package', () => {
       })
     })
   })
-
-
 })
