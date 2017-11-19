@@ -1,12 +1,13 @@
 'use babel'
 
-const path = require('path')
-const fs = require('fs-plus')
-const temp = require('temp')
-const wrench = require('wrench')
-const SvgPreviewView = require('../lib/svg-preview-view')
-const { $ } = require('atom-space-pen-views')
+import path from 'path'
+import fs from 'fs-plus'
+import temp from 'temp'
+import wrench from 'wrench'
+import SvgPreviewView from '../lib/svg-preview-view'
 import { TextEditor } from 'atom'
+
+const { atom, describe, it, expect, beforeEach, jasmine, waitsFor, runs, spyOn, waitsForPromise } = global
 
 describe('SVG preview package', () => {
   let preview, editor, workspaceElement
@@ -25,17 +26,19 @@ describe('SVG preview package', () => {
     atom.deserializers.add(SvgPreviewView)
 
     waitsForPromise(() => {
-      return atom.packages.activatePackage("svg-preview")
+      return atom.packages.activatePackage('svg-preview')
     })
   })
 
-  const expectPreviewInSplitPane = function() {
+  const expectPreviewInSplitPane = function () {
     waitsFor('svg editor to be created', () => {
-      return editor = atom.workspace.getPanes()[0].getActiveItem()
+      editor = atom.workspace.getPanes()[0].getActiveItem()
+      return editor
     })
 
     waitsFor('svg preview to be created', () => {
-      return preview = atom.workspace.getPanes()[1].getActiveItem()
+      preview = atom.workspace.getPanes()[1].getActiveItem()
+      return preview
     })
     runs(() => {
       expect(editor).toBeInstanceOf(TextEditor)
@@ -49,7 +52,7 @@ describe('SVG preview package', () => {
 
   describe('when a preview has not been created for the file', () => {
     it('displays a svg preview in a split pane', () => {
-      waitsForPromise(() => atom.workspace.open("subdir/file.svg"))
+      waitsForPromise(() => atom.workspace.open('subdir/file.svg'))
       runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
 
       expectPreviewInSplitPane()
@@ -63,7 +66,7 @@ describe('SVG preview package', () => {
 
     describe("when the editor's path does not exist", () => {
       it('splits the current pane to the right with a svg preview for the file', () => {
-        waitsForPromise(() => atom.workspace.open("new.svg"))
+        waitsForPromise(() => atom.workspace.open('new.svg'))
         runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
         expectPreviewInSplitPane()
       })
@@ -71,7 +74,7 @@ describe('SVG preview package', () => {
 
     describe('when the editor does not have a path', () => {
       it('splits the current pane to the right with a svg preview for the file', () => {
-        waitsForPromise(() => atom.workspace.open(""))
+        waitsForPromise(() => atom.workspace.open(''))
         runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
         expectPreviewInSplitPane()
       })
@@ -79,7 +82,7 @@ describe('SVG preview package', () => {
 
     describe('when the path contains a space', () => {
       it('renders the preview', () => {
-        waitsForPromise(() => atom.workspace.open("subdir/file with space.svg"))
+        waitsForPromise(() => atom.workspace.open('subdir/file with space.svg'))
         runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
         expectPreviewInSplitPane()
       })
@@ -87,7 +90,7 @@ describe('SVG preview package', () => {
 
     describe('when the path contains accented characters', () => {
       it('renders the preview', () => {
-        waitsForPromise(() => atom.workspace.open("subdir/áccéntéd.svg"))
+        waitsForPromise(() => atom.workspace.open('subdir/áccéntéd.svg'))
         runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
         expectPreviewInSplitPane()
       })
@@ -95,8 +98,8 @@ describe('SVG preview package', () => {
   })
 
   describe('when a preview has been created for the file', (done) => {
-    beforeEach(function() {
-      waitsForPromise(() => atom.workspace.open("subdir/file.svg"))
+    beforeEach(function () {
+      waitsForPromise(() => atom.workspace.open('subdir/file.svg'))
       runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
       expectPreviewInSplitPane()
     })
@@ -114,7 +117,7 @@ describe('SVG preview package', () => {
     })
 
     it('closes the existing preview when toggle is triggered on it and it has focus', () => {
-      const [ editorPane, previewPane ] = atom.workspace.getPanes()
+      const [ , previewPane ] = atom.workspace.getPanes()
       previewPane.activate()
       atom.commands.dispatch(workspaceElement, 'svg-preview:toggle')
 
@@ -130,7 +133,7 @@ describe('SVG preview package', () => {
 
         preview.onDidChangeSvg(listener)
 
-        runs(() => svgEditor.setText("<svg></svg>"))
+        runs(() => svgEditor.setText('<svg></svg>'))
         waitsFor('::onDidChangeSvg handler to be called', () => {
           return listener.callCount > 0
         })
@@ -139,13 +142,13 @@ describe('SVG preview package', () => {
       describe('when the preview is in the active pane but is not the active item', () => {
         it('re-renders the preview but does not make it active', () => {
           const svgEditor = atom.workspace.getActiveTextEditor()
-          const [_, previewPane ] = atom.workspace.getPanes()
+          const [ , previewPane ] = atom.workspace.getPanes()
           const preview = previewPane.itemAtIndex(0)
 
           previewPane.activate()
 
           waitsForPromise(() => atom.workspace.open())
-          runs(() => svgEditor.setText("<svg></svg>"))
+          runs(() => svgEditor.setText('<svg></svg>'))
 
           waitsFor(() => preview.find('.image-canvas').html().match(/<svg[^>]*><\/svg>/))
           runs(() => {
@@ -165,12 +168,15 @@ describe('SVG preview package', () => {
           previewPane.activate()
 
           let didChange = false
-          preview.onDidChangeSvg(() => didChange = true)
+          preview.onDidChangeSvg(() => {
+            didChange = true
+            return didChange
+          })
 
           waitsForPromise(() => atom.workspace.open())
           runs(() => {
             editorPane.activate()
-            return svgEditor.setText("<svg></svg>")
+            return svgEditor.setText('<svg></svg>')
           })
 
           waitsFor(() => didChange)
@@ -183,7 +189,6 @@ describe('SVG preview package', () => {
 
       describe('when the liveUpdate config is set to false', () => {
         it('only re-renders the svg when the editor is saved, not when the contents are modified', () => {
-
           atom.config.set('svg-preview.liveUpdate', false)
           const didStopChangingHandler = jasmine.createSpy('didStopChangingHandler')
 
@@ -206,7 +211,7 @@ describe('SVG preview package', () => {
     it('opens a preview editor and watches the file for changes', () => {
       waitsForPromise('atom.workspace.open promise to be resolved', () => {
         const filePath = atom.project.getDirectories()[0].resolve('subdir/file.svg')
-        return atom.workspace.open("svg-preview://" + filePath)
+        return atom.workspace.open('svg-preview://' + filePath)
       })
       runs(() => {
         preview = atom.workspace.getActivePaneItem()
@@ -225,7 +230,7 @@ describe('SVG preview package', () => {
     it('does not open the svg preview', () => {
       atom.config.set('svg-preview.grammars', [])
 
-      waitsForPromise(() => atom.workspace.open("subdir/file.svg"))
+      waitsForPromise(() => atom.workspace.open('subdir/file.svg'))
       runs(() => {
         spyOn(atom.workspace, 'open').andCallThrough()
         atom.commands.dispatch(workspaceElement, 'svg-preview:toggle')
@@ -238,7 +243,7 @@ describe('SVG preview package', () => {
     it("updates the preview's title", () => {
       const titleChangedCallback = jasmine.createSpy('titleChangedCallback')
 
-      waitsForPromise(() => atom.workspace.open("subdir/file.svg"))
+      waitsForPromise(() => atom.workspace.open('subdir/file.svg'))
       runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
 
       expectPreviewInSplitPane()
@@ -248,7 +253,7 @@ describe('SVG preview package', () => {
         return fs.renameSync(atom.workspace.getActiveTextEditor().getPath(), path.join(path.dirname(atom.workspace.getActiveTextEditor().getPath()), 'file2.svg'))
       })
 
-      waitsFor(() => preview.getTitle() === "file2.svg Preview")
+      waitsFor(() => preview.getTitle() === 'file2.svg Preview')
       runs(() => expect(titleChangedCallback).toHaveBeenCalled())
     })
   })
@@ -260,7 +265,7 @@ describe('SVG preview package', () => {
     })
   })
 
-  describe("when svg-preview:export-to-png is triggered", () => {
+  describe('when svg-preview:export-to-png is triggered', () => {
     beforeEach(() => {
       let fixturesPath, tempPath, workspaceElement
       fixturesPath = path.join(__dirname, 'fixtures')
@@ -273,14 +278,17 @@ describe('SVG preview package', () => {
       jasmine.attachToDOM(workspaceElement)
     })
 
-    it("saves a PNG and opens it", () => {
+    it('saves a PNG and opens it', () => {
       let outputPath = `${temp.path()}subdir/file with space.png`
       let previewPaneItem = null
 
       waitsForPromise(() => atom.workspace.open('subdir/file with space.svg'))
       runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
 
-      waitsFor(() => previewPaneItem = atom.workspace.getPanes()[1].getActiveItem())
+      waitsFor(() => {
+        previewPaneItem = atom.workspace.getPanes()[1].getActiveItem()
+        return previewPaneItem
+      })
       runs(() => {
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
         atom.commands.dispatch(previewPaneItem.element, 'svg-preview:export-to-png')
@@ -291,18 +299,21 @@ describe('SVG preview package', () => {
         expect(fs.isFileSync(outputPath)).toBe(true)
 
         let writtenFile = fs.readFileSync(outputPath)
-        expect(writtenFile).toContain("PNG")
+        expect(writtenFile).toContain('PNG')
       })
     })
 
-    it("saves a JPEG and opens it", () => {
+    it('saves a JPEG and opens it', () => {
       let outputPath = `${temp.path()}subdir/file with space.jpeg`
       let previewPaneItem = null
 
       waitsForPromise(() => atom.workspace.open('subdir/file with space.svg'))
       runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
 
-      waitsFor(() => previewPaneItem = atom.workspace.getPanes()[1].getActiveItem())
+      waitsFor(() => {
+        previewPaneItem = atom.workspace.getPanes()[1].getActiveItem()
+        return previewPaneItem
+      })
       runs(() => {
         spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
         atom.commands.dispatch(previewPaneItem.element, 'svg-preview:export-to-jpeg')
@@ -313,7 +324,7 @@ describe('SVG preview package', () => {
         let writtenFile
         expect(fs.isFileSync(outputPath)).toBe(true)
         writtenFile = fs.readFileSync(outputPath)
-        expect(writtenFile).toContain("JFIF")
+        expect(writtenFile).toContain('JFIF')
       })
     })
   })

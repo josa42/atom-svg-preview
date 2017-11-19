@@ -1,12 +1,13 @@
 'use babel'
 
-const path = require('path')
-const SvgPreviewView = require('../lib/svg-preview-view')
+import SvgPreviewView from '../lib/svg-preview-view'
+
+const { atom, afterEach, describe, it, expect, beforeEach, jasmine, runs, waitsForPromise } = global
+
+let preview
 
 describe('SvgPreviewView', () => {
-
   beforeEach(() => {
-
     const [ dir ] = atom.project.getDirectories()
     const filePath = dir != null ? dir.resolve('subdir/file.svg') : undefined
 
@@ -24,12 +25,12 @@ describe('SvgPreviewView', () => {
       expect(preview.find('.svg-spinner')).toExist()
 
       waitsForPromise(() => preview.renderSvg())
-      runs(() => expect(preview.find(".svg-spinner")).not.toExist())
+      runs(() => expect(preview.find('.svg-spinner')).not.toExist())
     })
 
     it('shows an error message when there is an error', () => {
-      preview.showError("Not a real file")
-      expect(preview.text()).toContain("Failed")
+      preview.showError('Not a real file')
+      expect(preview.text()).toContain('Failed')
     })
   })
 

@@ -3,11 +3,11 @@
 import fs from 'fs'
 import path from 'path'
 
-const { $ } = require('atom-space-pen-views')
+const { describe, it, expect } = global
+
 const getSVGSize = require('../lib/get-svg-size')
 
-function getSVGElement(name) {
-
+function getSVGElement (name) {
   const s = fs.readFileSync(path.join(__dirname, 'fixtures', 'subdir', `${name}.svg`), 'utf-8')
   const div = document.createElement('div')
 
@@ -17,7 +17,6 @@ function getSVGElement(name) {
 }
 
 describe('getSVGSize()', () => {
-
   it('gets size of svg with width/height attributes', () => {
     const svg = getSVGElement('file-size-attr')
     expect(getSVGSize(svg)).toEqual({ width: 400, height: 400 })
