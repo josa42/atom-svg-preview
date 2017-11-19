@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.0
+- Add config to open preview in a pane on the bottom
+- Bugfixes
+
 ## 0.11.0
 - More consistent zooming behavior
 
