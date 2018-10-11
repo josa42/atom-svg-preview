@@ -49,9 +49,6 @@ describe('SVG preview package', () => {
   const runsAfter = (time, fn) => waitsForPromise(() => new Promise((resolve) => setTimeout(resolve, time)).then(fn))
 
   describe('when a preview has not been created for the file', () => {
-    // TODO 💩  for unknown reasons the first tests case fail
-    it('dummy', () => waitsForPromise(() => atom.workspace.open('subdir/file.svg')))
-
     it('displays a svg preview in a split pane', () => {
       waitsForPromise(() => atom.workspace.open('subdir/file.svg'))
       runs(() => atom.commands.dispatch(workspaceElement, 'svg-preview:toggle'))
