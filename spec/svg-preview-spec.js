@@ -7,7 +7,9 @@ import wrench from 'wrench'
 import SvgPreviewView from '../lib/svg-preview-view'
 import { TextEditor } from 'atom'
 
-const { atom, describe, it, expect, beforeEach, jasmine, waitsFor, runs, spyOn, waitsForPromise } = global
+temp.track()
+
+const { atom, describe, it, expect, beforeEach, afterEach, jasmine, waitsFor, runs, spyOn, waitsForPromise } = global
 
 describe('SVG preview package', () => {
   let preview, editor, workspaceElement
@@ -26,6 +28,10 @@ describe('SVG preview package', () => {
     atom.deserializers.add(SvgPreviewView)
 
     waitsForPromise(() => atom.packages.activatePackage('svg-preview'))
+  })
+
+  afterEach(() => {
+    temp.cleanupSync()
   })
 
   const expectPreviewInSplitPane = function () {
@@ -277,7 +283,7 @@ describe('SVG preview package', () => {
     })
 
     it('saves a PNG and opens it', () => {
-      let outputPath = `${temp.path()}subdir/file with space.png`
+      let outputPath = path.join(temp.mkdirSync(), 'subdir__file with space.png')
       let previewPaneItem = null
 
       waitsForPromise(() => atom.workspace.open('subdir/file with space.svg'))
@@ -288,7 +294,7 @@ describe('SVG preview package', () => {
         return previewPaneItem
       })
       runs(() => {
-        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        spyOn(atom.applicationDelegate, 'showSaveDialog').andReturn(outputPath)
         atom.commands.dispatch(previewPaneItem.element, 'svg-preview:export-to-png')
       })
 
@@ -302,7 +308,7 @@ describe('SVG preview package', () => {
     })
 
     it('saves a JPEG and opens it', () => {
-      let outputPath = `${temp.path()}subdir/file with space.jpeg`
+      let outputPath = path.join(temp.mkdirSync(), 'subdir__file with space.jpeg')
       let previewPaneItem = null
 
       waitsForPromise(() => atom.workspace.open('subdir/file with space.svg'))
@@ -313,7 +319,7 @@ describe('SVG preview package', () => {
         return previewPaneItem
       })
       runs(() => {
-        spyOn(atom, 'showSaveDialogSync').andReturn(outputPath)
+        spyOn(atom.applicationDelegate, 'showSaveDialog').andReturn(outputPath)
         atom.commands.dispatch(previewPaneItem.element, 'svg-preview:export-to-jpeg')
       })
 
