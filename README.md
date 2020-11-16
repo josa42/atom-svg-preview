@@ -2,7 +2,7 @@
 
 Show the rendered SVG to the right of the current editor, refreshed live.
 
-[![Build Status](https://img.shields.io/travis/josa42/atom-svg-preview/master.svg?style=flat-square)](https://travis-ci.org/josa42/atom-svg-preview)
+[![Test](https://github.com/josa42/atom-svg/workflows/Main/badge.svg?branch=master)](https://github.com/josa42/atom-svg/actions?query=workflow%3AMain)
 [![Build Status](https://img.shields.io/appveyor/ci/josa42/atom-svg-preview/master.svg?style=flat-square)](https://ci.appveyor.com/project/josa42/atom-svg-preview)
 [![Plugin installs!](https://img.shields.io/apm/dm/svg-preview.svg?style=flat-square)](https://atom.io/packages/svg-preview)
 [![Package version!](https://img.shields.io/apm/v/svg-preview.svg?style=flat-square)](https://atom.io/packages/svg-preview)

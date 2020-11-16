@@ -1,0 +1,21 @@
+name: Main
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  Test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        channel: [stable, beta]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: npx setup-atom ${{ matrix.channel }}
+      - run: atom -v
+      - run: apm -v
+      - run: apm ci
+      - run: apm test
+      - run: npm run lint
